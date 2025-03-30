@@ -138,4 +138,37 @@ mod tests {
             "https://v2.jokeapi.dev/joke/Dark?blacklistFlags=nsfw&format=txt&type=&amount=10"
         );
     }
+
+    #[cfg(feature = "async")]
+    #[tokio::test]
+    async fn test_async_mode() {
+        use crate::Joke;
+        use wiremock::{
+            Mock, MockServer, ResponseTemplate,
+            matchers::{method, path},
+        };
+
+        let builder = JokeBuilder::default().add_category(Category::Dark);
+        let mock_server = MockServer::start().await;
+        let json_response = r#"
+                {
+                    error: false,
+                    joke_type: "single",
+                    joke: "single joke"
+                }
+            "#;
+        Mock::given(method("GET"))
+            .and(path("/joke/Dark"))
+            .respond_with(ResponseTemplate::new(200).set_body_json(json_response))
+            .mount(&mock_server)
+            .await;
+
+        let joke = builder.fetch().await;
+        assert!(joke.is_ok());
+        if let Joke::Single(j) = joke.unwrap() {
+            assert_eq!(j, "single joke");
+        } else {
+            panic!("Expected Joke::Single");
+        }
+    }
 }
