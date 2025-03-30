@@ -4,7 +4,7 @@ pub struct JokeBuilder {
     base_url: String,
     categories: Selector<Category>,
     flags: Selector<Flag>,
-    format: Selector<Format>,
+    format: Format,
     joke_type: Selector<JokeType>,
     amount: u8,
 }
@@ -12,15 +12,13 @@ pub struct JokeBuilder {
 impl JokeBuilder {
     pub fn new() -> Self {
         let mut categories = Selector::new(&[Category::Any]);
-        let mut format = Selector::new(&[Format::Json, Format::Xml, Format::Yaml, Format::Txt]);
         categories.select(Category::Any);
-        format.select(Format::Json);
 
         Self {
             base_url: String::from("https://v2.jokeapi.dev/joke/"),
             categories,
             flags: Selector::new(&[]),
-            format,
+            format: Format::Json,
             joke_type: Selector::new(&[JokeType::Single, JokeType::Twopart]),
             amount: 1,
         }
@@ -44,7 +42,7 @@ impl JokeBuilder {
     }
 
     pub fn format(mut self, format: Format) -> Self {
-        self.format.select(format);
+        self.format = format;
         self
     }
 
