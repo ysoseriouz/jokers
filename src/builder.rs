@@ -55,6 +55,32 @@ impl JokeBuilder {
         self.amount = amount;
         self
     }
+
+    #[cfg(feature = "async")]
+    pub async fn fetch(&self) -> Result<crate::Joke, crate::Error> {
+        use crate::joke::parse_joke;
+
+        let resp = reqwest::Client::new()
+            .get(self.url())
+            .send()
+            .await?
+            .text()
+            .await?;
+
+        parse_joke(&resp, &self.format)
+    }
+
+    #[cfg(feature = "blocking")]
+    pub fn get(&self) -> Result<crate::Joke, crate::Error> {
+        use crate::joke::parse_joke;
+
+        let resp = reqwest::blocking::Client::new()
+            .get(self.url())
+            .send()?
+            .text()?;
+
+        parse_joke(&resp, &self.format)
+    }
 }
 
 impl Default for JokeBuilder {

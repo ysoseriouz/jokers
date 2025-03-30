@@ -1,8 +1,9 @@
+use serde::Deserialize;
 use std::collections::HashSet;
 use std::fmt::{Display, Formatter, Result};
 use std::hash::Hash;
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Deserialize)]
 pub enum Category {
     Any,
     Misc,
@@ -13,7 +14,8 @@ pub enum Category {
     Christmas,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub enum Flag {
     Nsfw,
     Religious,
@@ -23,7 +25,8 @@ pub enum Flag {
     Explicit,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub enum Format {
     Json,
     Xml,
@@ -31,7 +34,8 @@ pub enum Format {
     Txt,
 }
 
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub enum JokeType {
     Single,
     Twopart,
