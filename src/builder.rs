@@ -1,4 +1,4 @@
-use crate::params::*;
+use crate::*;
 
 pub struct JokeBuilder {
     base_url: String,
@@ -57,7 +57,7 @@ impl JokeBuilder {
     }
 
     #[cfg(feature = "async")]
-    pub async fn fetch(&self) -> Result<crate::Joke, crate::Error> {
+    pub async fn fetch(&self) -> Result<Vec<Joke>> {
         use crate::joke::parse_joke;
 
         let resp = reqwest::Client::new()
@@ -67,11 +67,11 @@ impl JokeBuilder {
             .text()
             .await?;
 
-        parse_joke(&resp, &self.format)
+        parse_joke(&resp, &self.format, self.amount)
     }
 
     #[cfg(feature = "blocking")]
-    pub fn get(&self) -> Result<crate::Joke, crate::Error> {
+    pub fn get(&self) -> Result<Vec<Joke>> {
         use crate::joke::parse_joke;
 
         let resp = reqwest::blocking::Client::new()
@@ -79,7 +79,7 @@ impl JokeBuilder {
             .send()?
             .text()?;
 
-        parse_joke(&resp, &self.format)
+        parse_joke(&resp, &self.format, self.amount)
     }
 }
 
