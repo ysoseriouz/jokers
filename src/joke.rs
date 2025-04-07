@@ -75,6 +75,7 @@ struct JokeResponse {
 #[derive(Debug, Deserialize)]
 struct MultiJokeResponse {
     error: bool,
+    #[allow(dead_code)]
     amount: u8,
     jokes: Vec<Joke>,
 }
