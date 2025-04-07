@@ -65,3 +65,90 @@ impl fmt::Display for Joke {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_parse_single_joke_json() {
+        let json = r#"
+        {
+            "error": false,
+            "category": "Programming",
+            "type": "single",
+            "joke": "test joke",
+            "safe": true
+        }
+        "#;
+        let result = parse_joke(json, &Format::Json, 1);
+        assert!(result.is_ok());
+
+        let jokes = result.unwrap();
+        assert_eq!(jokes.len(), 1);
+        assert_eq!(jokes[0].category, Category::Programming);
+        assert_eq!(jokes[0].joke_type, JokeType::Single);
+        assert_eq!(jokes[0].joke, "test joke");
+    }
+
+    #[test]
+    fn test_parse_multi_joke_json() {
+        let json = r#"
+        {
+            "error": false,
+            "amount": 2,
+            "jokes": [
+                {
+                    "category": "Programming",
+                    "type": "single",
+                    "joke": "joke1",
+                    "safe": true
+                },
+                {
+                    "category": "Misc",
+                    "type": "twopart",
+                    "setup": "joke2 setup",
+                    "delivery": "joke2 delivery",
+                    "safe": true
+                }
+            ]
+        }
+        "#;
+
+        let result = parse_joke(json, &Format::Json, 2);
+        assert!(result.is_ok());
+
+        let jokes = result.unwrap();
+        assert_eq!(jokes.len(), 2);
+
+        assert_eq!(jokes[0].category, Category::Programming);
+        assert_eq!(jokes[0].joke_type, JokeType::Single);
+        assert_eq!(jokes[0].joke, "joke1");
+        assert_eq!(jokes[1].category, Category::Misc);
+        assert_eq!(jokes[1].joke_type, JokeType::Twopart);
+        assert_eq!(jokes[1].setup, "joke2 setup");
+        assert_eq!(jokes[1].delivery, "joke2 delivery");
+    }
+
+    #[test]
+    fn test_parse_error_response() {
+        let json = r#"
+        {
+            "error": true,
+            "category": "Programming",
+            "type": "single",
+            "joke": "This won't be returned",
+            "safe": true
+        }
+        "#;
+
+        let result = parse_joke(json, &Format::Json, 1);
+        assert!(result.is_err());
+
+        if let Err(Error::ApiResponse(msg)) = result {
+            assert_eq!(msg, "error:true");
+        } else {
+            panic!("Expected ApiResponse error");
+        }
+    }
+}
